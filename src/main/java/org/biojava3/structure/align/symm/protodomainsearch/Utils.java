@@ -34,6 +34,7 @@ public class Utils {
 	private static Utils me;
 	
 	public static Utils getInstance() {
+		if (Utils.me == null) throw new IllegalStateException("Must set instance first");
 		return me;
 	}
 

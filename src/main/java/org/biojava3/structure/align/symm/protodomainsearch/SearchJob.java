@@ -2,6 +2,7 @@ package org.biojava3.structure.align.symm.protodomainsearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -14,10 +15,8 @@ import org.biojava.bio.structure.align.StructureAlignment;
 import org.biojava.bio.structure.align.model.AFPChain;
 import org.biojava.bio.structure.align.util.AFPChainScorer;
 import org.biojava.bio.structure.align.util.AtomCache;
-import org.biojava.bio.structure.scop.ScopDatabase;
 import org.biojava.bio.structure.scop.ScopDescription;
 import org.biojava.bio.structure.scop.ScopDomain;
-import org.biojava.bio.structure.scop.ScopFactory;
 import org.biojava3.structure.align.symm.census2.Alignment;
 import org.biojava3.structure.align.symm.census2.Census.AlgorithmGiver;
 import org.biojava3.structure.align.symm.census2.CensusJob;
@@ -87,8 +86,7 @@ public class SearchJob implements Callable<SearchResult> {
 	}
 	
 	private Result getSymmetry(ScopDomain domain) {
-		//ScopDescription superfamily = scop.getScopDescriptionBySunid(domain.getSuperfamilyId());
-		ScopDescription superfamily = null; // TODO HELP!
+		ScopDescription superfamily = superfamilies.get(domain.getScopId());
 		CensusJob job = new CensusJob(cache, symmetryAlgorithm, symmetrySignificance);
 		job.setCount(0);
 		job.setDomain(domain);
@@ -105,6 +103,12 @@ public class SearchJob implements Callable<SearchResult> {
 	private AlgorithmGiver symmetryAlgorithm;
 
 	private AlgorithmGiver algorithm;
+
+	private HashMap<String,ScopDescription> superfamilies;
+	
+	public void setSuperfamilies(HashMap<String, ScopDescription> superfamilies) {
+		this.superfamilies = superfamilies;
+	}
 
 	public void setCache(AtomCache cache) {
 		this.cache = cache;
@@ -141,7 +145,9 @@ public class SearchJob implements Callable<SearchResult> {
 	@Override
 	public SearchResult call() throws Exception {
 		
-		if (cache == null || count == null || queryDomain == null || representatives == null) throw new IllegalStateException("Cache, domain, count, and representatives must be set first");
+		if (cache == null || count == null || queryDomain == null || representatives == null || superfamilies == null) {
+			throw new IllegalStateException("Cache, domain, count, representatives, and superfamilies must be set first");
+		}
 		final String queryScopId = query.getScopId();
 		final String protodomain = query.getProtodomain();
 		List<Discovery> discoveries = new ArrayList<Discovery>();

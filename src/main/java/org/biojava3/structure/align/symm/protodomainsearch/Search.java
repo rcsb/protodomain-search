@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -16,6 +17,7 @@ import org.biojava.bio.structure.align.StructureAlignment;
 import org.biojava.bio.structure.align.ce.CeMain;
 import org.biojava.bio.structure.align.util.AtomCache;
 import org.biojava.bio.structure.scop.ScopDatabase;
+import org.biojava.bio.structure.scop.ScopDescription;
 import org.biojava.bio.structure.scop.ScopDomain;
 import org.biojava.bio.structure.scop.ScopFactory;
 import org.biojava3.core.util.ConcurrencyTools;
@@ -71,6 +73,7 @@ public class Search {
 
 	public static void searchDefault(String pdbDir, File census, File output) {
 		try {
+			Utils.setInstance(new Utils(new AtomCache(pdbDir, false)));
 			Utils.setBerkeleyScop(pdbDir);
 			Search search = new Search(census);
 			search.setCache(new AtomCache(pdbDir, false));
@@ -142,14 +145,24 @@ public class Search {
 
 	public void search() {
 
+		if (outputFile == null) throw new IllegalStateException("Must set file first");
+		if (cache == null) cache = new AtomCache();
+
+		ScopDatabase scop = ScopFactory.getSCOP();
+
+		if (representatives == null) {
+			representatives = Representatives.get();
+		}
+
+		HashMap<String,ScopDescription> superfamilies = new HashMap<String,ScopDescription>();
+		for (ScopDomain domain : representatives) {
+			final ScopDescription sf = scop.getScopDescriptionBySunid(domain.getSuperfamilyId());
+			superfamilies.put(domain.getScopId(), sf);
+		}
+		
 		try {
 
-			if (outputFile == null) throw new IllegalStateException("Must set file first");
-			if (cache == null) cache = new AtomCache();
-
 			List<Future<SearchResult>> futures = new ArrayList<Future<SearchResult>>();
-
-			ScopDatabase scop = ScopFactory.getSCOP();
 
 			// submit jobs
 			int count = 0;
@@ -159,6 +172,7 @@ public class Search {
 					SearchJob job = new SearchJob(query, representatives);
 					job.setAlgorithm(algorithm);
 					job.setCount(count);
+					job.setSuperfamilies(superfamilies);
 					job.setSymmetryAlgorithm(symmetryAlgorithm);
 					job.setCache(cache);
 					job.setQueryDomain(scop.getDomainByScopID(query.getScopId()));
