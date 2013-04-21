@@ -151,7 +151,7 @@ public class SearchResults implements Serializable {
 	}
 
 	public String toXML() throws IOException {
-
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 
@@ -163,7 +163,7 @@ public class SearchResults implements Serializable {
 			throw new IOException(e);
 		}
 
-		return baos.toString();
+		return Utils.spacesToTabs(baos.toString(), 4);
 
 	}
 

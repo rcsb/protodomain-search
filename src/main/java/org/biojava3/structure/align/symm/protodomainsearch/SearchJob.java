@@ -34,8 +34,20 @@ public class SearchJob implements Callable<SearchResult> {
 	}
 
 	private final Result query;
-	
+
 	private Integer count;
+
+	private boolean checkDiscoveryDomain;
+
+	private boolean checkDiscoverySymmetry;
+
+	public void setCheckDiscoveryDomain(boolean checkDiscoveryDomain) {
+		this.checkDiscoveryDomain = checkDiscoveryDomain;
+	}
+
+	public void setCheckDiscoverySymmetry(boolean checkDiscoverySymmetry) {
+		this.checkDiscoverySymmetry = checkDiscoverySymmetry;
+	}
 
 	public void setCount(int count) {
 		this.count = count;
@@ -71,6 +83,10 @@ public class SearchJob implements Callable<SearchResult> {
 		this.representatives = representatives;
 	}
 
+	public SearchJob(Result query, Representatives representatives) {
+		this(query, representatives.getDomains());
+	}
+
 	public SearchJob(Result query, List<ScopDomain> representatives) {
 		this.query = query;
 		this.representatives = representatives;
@@ -84,7 +100,7 @@ public class SearchJob implements Callable<SearchResult> {
 	private AFPChain alignDomainDomain(ScopDomain queryDomain, ScopDomain domain) throws IOException, StructureException {
 		return align(queryDomain.getScopId(), domain.getScopId(), algorithm);
 	}
-	
+
 	private Result getSymmetry(ScopDomain domain) {
 		ScopDescription superfamily = superfamilies.get(domain.getScopId());
 		CensusJob job = new CensusJob(cache, symmetryAlgorithm, symmetrySignificance);
@@ -105,7 +121,7 @@ public class SearchJob implements Callable<SearchResult> {
 	private AlgorithmGiver algorithm;
 
 	private HashMap<String,ScopDescription> superfamilies;
-	
+
 	public void setSuperfamilies(HashMap<String, ScopDescription> superfamilies) {
 		this.superfamilies = superfamilies;
 	}
@@ -137,21 +153,21 @@ public class SearchJob implements Callable<SearchResult> {
 	}
 
 	private ScopDomain queryDomain;
-	
+
 	public void setQueryDomain(ScopDomain queryDomain) {
 		this.queryDomain = queryDomain;
 	}
 
 	@Override
 	public SearchResult call() throws Exception {
-		
+
 		if (cache == null || count == null || queryDomain == null || representatives == null || superfamilies == null) {
 			throw new IllegalStateException("Cache, domain, count, representatives, and superfamilies must be set first");
 		}
 		final String queryScopId = query.getScopId();
 		final String protodomain = query.getProtodomain();
 		List<Discovery> discoveries = new ArrayList<Discovery>();
-		
+
 		for (ScopDomain domain : representatives) {
 
 			if (domain.getRanges() == null || domain.getRanges().isEmpty()) {
@@ -159,41 +175,47 @@ public class SearchJob implements Callable<SearchResult> {
 				continue;
 			}
 			try {
-				
+
 				logger.info("Working on " + domain.getScopId() + " against " + protodomain);
-				
+
 				Atom[] ca2 = cache.getAtoms(domain.getScopId());
 				AFPChain afpChain = alignProtodomainDomain(protodomain, domain, ca2);
 				Result symmetryResult = null;
 				Alignment domainDomain = null;
 				Alignment alignment = new Alignment(afpChain);
 				String resultProtodomain = null;
-				
+
 				if (significance.isPossiblySignificant(alignment)) {
 					try {
 						resultProtodomain = Protodomain.fromReferral(afpChain, ca2, 1, cache).getString();
 					} catch (RuntimeException e) {
 						logger.error("Could not get protodomain for result " + domain.getScopId() + " from " + queryScopId, e);
 					}
-					try {
-						symmetryResult = getSymmetry(domain);
-					} catch (RuntimeException e) {
-						logger.error("Couldn't get the symmetry for " + domain, e);
+
+					if (checkDiscoverySymmetry) {
+						try {
+							symmetryResult = getSymmetry(domain);
+						} catch (RuntimeException e) {
+							logger.error("Couldn't get the symmetry for " + domain, e);
+						}
 					}
-					try {
-						AFPChain domainDomainAfpChain = alignDomainDomain(queryDomain, domain);
-						domainDomain = new Alignment(domainDomainAfpChain);
-					} catch (RuntimeException e) {
-						logger.error("Failed aligning " + queryScopId + " against " + domain.getScopId(), e);
+					if (checkDiscoveryDomain) {
+						try {
+							AFPChain domainDomainAfpChain = alignDomainDomain(queryDomain, domain);
+							domainDomain = new Alignment(domainDomainAfpChain);
+						} catch (RuntimeException e) {
+							logger.error("Failed aligning " + queryScopId + " against " + domain.getScopId(), e);
+						}
 					}
 				};
-				
+
 				Discovery discovery = new Discovery();
 				discovery.setAlignment(alignment);
 				discovery.setResult(symmetryResult);
 				discovery.setProtodomain(resultProtodomain);
 				discovery.setDomainDomain(domainDomain);
-				
+				discoveries.add(discovery);
+
 			} catch (Exception e) {
 				logger.error("An error occured on " + queryScopId);
 				continue;
@@ -203,7 +225,7 @@ public class SearchJob implements Callable<SearchResult> {
 		SearchResult result = new SearchResult();
 		result.setQuery(query);
 		result.setDiscoveries(discoveries);
-		
+
 		return result;
 	}
 

@@ -48,5 +48,43 @@ public class Discovery implements Serializable {
 	public void setAlignment(Alignment alignment) {
 		this.alignment = alignment;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((alignment == null) ? 0 : alignment.hashCode());
+		result = prime * result + ((domainDomain == null) ? 0 : domainDomain.hashCode());
+		result = prime * result + ((protodomain == null) ? 0 : protodomain.hashCode());
+		result = prime * result + ((this.result == null) ? 0 : this.result.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Discovery other = (Discovery) obj;
+		if (alignment == null) {
+			if (other.alignment != null) return false;
+		} else if (!alignment.equals(other.alignment)) return false;
+		if (domainDomain == null) {
+			if (other.domainDomain != null) return false;
+		} else if (!domainDomain.equals(other.domainDomain)) return false;
+		if (protodomain == null) {
+			if (other.protodomain != null) return false;
+		} else if (!protodomain.equals(other.protodomain)) return false;
+		if (result == null) {
+			if (other.result != null) return false;
+		} else if (!result.equals(other.result)) return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Discovery [result=" + result + ", alignment=" + alignment + ", protodomain=" + protodomain
+				+ ", domainDomain=" + domainDomain + "]";
+	}
 	
 }

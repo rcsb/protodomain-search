@@ -1,8 +1,11 @@
 package org.biojava3.structure.align.symm.protodomainsearch;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
@@ -21,9 +24,21 @@ public class Utils {
 	public AtomCache getCache() {
 		return cache;
 	}
-	
+
+	public static boolean isSet() {
+		return me != null;
+	}
+	public static final String NEWLINE;
+	static {
+		NEWLINE = System.getProperty("line.separator");
+	}
+	public Utils() {
+		this(new AtomCache());
+	}
+	public Utils(String pdbDir) {
+		this(new AtomCache(pdbDir, false));
+	}
 	public Utils(AtomCache cache) {
-		super();
 		this.cache = cache;
 	}
 
@@ -60,6 +75,14 @@ public class Utils {
 			i++;
 		}
 		return r;
+	}
+
+	public static ScopDatabase setBerkeleyScop() {
+		ScopDatabase scop = ScopFactory.getSCOP();
+		if (!scop.getClass().getName().equals(BerkeleyScopInstallation.class.getName())) { // for efficiency
+			ScopFactory.setScopDatabase(new BerkeleyScopInstallation());
+		}
+		return ScopFactory.getSCOP();
 	}
 
 	public static ScopDatabase setBerkeleyScop(String pdbDir) {
@@ -160,5 +183,35 @@ public class Utils {
 		String secs = "and " + millis / 1000 % 60 + " seconds.";
 		return hrs + mins + secs;
 	}
+	
+	/**
+	 * Converts space indentation to tab indentation, assuming no lines have trailing whitespace.
+	 * @param input
+	 * @param output
+	 * @param nSpaces
+	 * @throws IOException
+	 */
+	public static void spacesToTabs(File input, File output, int nSpaces) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(input));
+		PrintWriter pw = new PrintWriter(output);
+		String line = "";
+		while ((line = br.readLine()) != null) {
+			String trimmed = line.trim();
+			int indent = (int) (((float) (line.length() - trimmed.length())) / (float) nSpaces);
+			pw.println(repeat("\t", indent) + trimmed);
+		}
+		br.close();
+		pw.close();
+	}
 
+	public static String spacesToTabs(String input, int nSpaces) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		String[] lines = input.split(NEWLINE);
+		for (String line : lines) {
+			String trimmed = line.trim();
+			int indent = (int) (((float) (line.length() - trimmed.length())) / (float) nSpaces);
+			sb.append(repeat("\t", indent) + trimmed + NEWLINE);
+		}
+		return sb.toString();
+	}
 }

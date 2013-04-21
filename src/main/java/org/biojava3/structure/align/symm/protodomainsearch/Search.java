@@ -151,15 +151,9 @@ public class Search {
 		ScopDatabase scop = ScopFactory.getSCOP();
 
 		if (representatives == null) {
-			representatives = Representatives.get();
+			representatives = Representatives.get().getDomains();
 		}
 
-		HashMap<String,ScopDescription> superfamilies = new HashMap<String,ScopDescription>();
-		for (ScopDomain domain : representatives) {
-			final ScopDescription sf = scop.getScopDescriptionBySunid(domain.getSuperfamilyId());
-			superfamilies.put(domain.getScopId(), sf);
-		}
-		
 		try {
 
 			List<Future<SearchResult>> futures = new ArrayList<Future<SearchResult>>();
@@ -172,7 +166,7 @@ public class Search {
 					SearchJob job = new SearchJob(query, representatives);
 					job.setAlgorithm(algorithm);
 					job.setCount(count);
-					job.setSuperfamilies(superfamilies);
+					job.setSuperfamilies(Representatives.get().getSuperfamilies());
 					job.setSymmetryAlgorithm(symmetryAlgorithm);
 					job.setCache(cache);
 					job.setQueryDomain(scop.getDomainByScopID(query.getScopId()));
