@@ -65,7 +65,7 @@ public class SearchJobTest {
 		job.setCount(0);
 		job.setSignificance(SearchResultSignificanceFactory.ultraLiberal());
 		job.setSuperfamilies(reps.getSuperfamilies());
-		job.setSymmetrySignificance(SignificanceFactory.getUltraLiberal());
+		job.setSymmetrySignificance(SignificanceFactory.ultraLiberal());
 		return job;
 	}
 

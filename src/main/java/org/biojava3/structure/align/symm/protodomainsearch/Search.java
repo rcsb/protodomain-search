@@ -41,7 +41,7 @@ public class Search {
 
 	private AtomCache cache;
 
-	private boolean checkDiscoveryDomain;
+	private boolean checkDiscoveryDomain = true;
 
 	private boolean checkDiscoverySymmetry = true;
 
@@ -54,7 +54,7 @@ public class Search {
 
 	private AlgorithmGiver symmetryAlgorithm = Census.AlgorithmGiver.getDefault();
 
-	private Significance symmetrySignificance = SignificanceFactory.getForCensus();
+	private Significance symmetrySignificance = SignificanceFactory.forCensus();
 
 	static {
 		BasicConfigurator.configure();
@@ -169,6 +169,8 @@ public class Search {
 					job.setSuperfamilies(Representatives.get().getSuperfamilies());
 					job.setSymmetryAlgorithm(symmetryAlgorithm);
 					job.setCache(cache);
+					job.setCheckDiscoveryDomain(checkDiscoveryDomain);
+					job.setCheckDiscoverySymmetry(checkDiscoverySymmetry);
 					job.setQueryDomain(scop.getDomainByScopID(query.getScopId()));
 					job.setSymmetrySignificance(symmetrySignificance);
 					logger.debug("Submitting new job for " + query.getScopId() + " (job #" + count + ")");
