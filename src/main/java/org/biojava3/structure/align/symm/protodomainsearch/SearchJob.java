@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.align.StructureAlignment;
+import org.biojava.bio.structure.align.client.PdbPair;
 import org.biojava.bio.structure.align.model.AFPChain;
 import org.biojava.bio.structure.align.util.AFPChainScorer;
 import org.biojava.bio.structure.align.util.AtomCache;
@@ -23,6 +24,8 @@ import org.biojava3.structure.align.symm.census2.CensusJob;
 import org.biojava3.structure.align.symm.census2.Result;
 import org.biojava3.structure.align.symm.census2.Significance;
 import org.biojava3.structure.align.symm.protodomain.Protodomain;
+import org.rcsb.fatcat.server.dao.DBAlignment;
+import org.rcsb.fatcat.server.util.AlignmentCache;
 
 public class SearchJob implements Callable<SearchResult> {
 
@@ -200,11 +203,28 @@ public class SearchJob implements Callable<SearchResult> {
 						}
 					}
 					if (checkDiscoveryDomain) {
-						try {
-							AFPChain domainDomainAfpChain = alignDomainDomain(queryDomain, domain);
-							domainDomain = new Alignment(domainDomainAfpChain);
-						} catch (RuntimeException e) {
-							logger.error("Failed aligning " + queryScopId + " against " + domain.getScopId(), e);
+						{
+							PdbPair pair = new PdbPair(queryScopId, domain.getScopId());
+							DBAlignment aln = AlignmentCache.getInstance().getDbAlignment(pair);
+							if (aln == null) {
+								try {
+									AFPChain domainDomainAfpChain = alignDomainDomain(queryDomain, domain);
+									domainDomain = new Alignment(domainDomainAfpChain);
+								} catch (RuntimeException e) {
+									logger.error("Failed aligning " + queryScopId + " against " + domain.getScopId(), e);
+								}
+							} else {
+								domainDomain = new Alignment();
+								domainDomain.setRmsd(aln.getRmsdOpt());
+								domainDomain.setAlignScore(aln.getScore());
+								domainDomain.setIdentity((float) (aln.getID() / 100.0));
+								domainDomain.setSimilarity((float) (aln.getSim1() / 100.0));
+								Double tmScore = aln.getTmScore();
+								if (tmScore != null) {
+									domainDomain.setTmScore((float) (double) tmScore);
+								}
+								domainDomain.setzScore(aln.getProbability());
+							}
 						}
 					}
 				};
