@@ -40,8 +40,4 @@
 		<version>0.1.31-SNAPSHOT</version>
 	</dependency>
   </dependencies>
-  <scm>
-  	<connection>scm:svn+ssh://ssh.phx.nearlyfreespeech.net/home/private/svn/Census2/trunk</connection>
-  	<developerConnection>scm:svn+ssh://ssh.phx.nearlyfreespeech.net/home/private/svn/Census2/trunk</developerConnection>
-  </scm>
 </project>
