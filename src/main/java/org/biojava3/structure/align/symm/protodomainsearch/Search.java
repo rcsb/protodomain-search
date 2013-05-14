@@ -6,18 +6,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.biojava.bio.structure.align.StructureAlignment;
 import org.biojava.bio.structure.align.ce.CeMain;
 import org.biojava.bio.structure.align.util.AtomCache;
 import org.biojava.bio.structure.scop.ScopDatabase;
-import org.biojava.bio.structure.scop.ScopDescription;
 import org.biojava.bio.structure.scop.ScopDomain;
 import org.biojava.bio.structure.scop.ScopFactory;
 import org.biojava3.core.util.ConcurrencyTools;
@@ -30,7 +28,7 @@ import org.biojava3.structure.align.symm.census2.SignificanceFactory;
 
 public class Search {
 
-	static final Logger logger = Logger.getLogger(Search.class.getPackage().getName());
+	private static final Logger logger = LogManager.getLogger(Search.class.getPackage().getName());
 
 	private AlgorithmGiver algorithm = new AlgorithmGiver() {
 		@Override
@@ -55,10 +53,6 @@ public class Search {
 	private AlgorithmGiver symmetryAlgorithm = Census.AlgorithmGiver.getDefault();
 
 	private Significance symmetrySignificance = SignificanceFactory.forCensus();
-
-	static {
-		BasicConfigurator.configure();
-	}
 
 	public static void main(String[] args) throws IOException {
 		if (args.length != 3) {

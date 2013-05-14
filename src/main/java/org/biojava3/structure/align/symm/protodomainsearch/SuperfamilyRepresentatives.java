@@ -5,9 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.biojava.bio.structure.align.util.AtomCache;
 import org.biojava.bio.structure.scop.ScopCategory;
 import org.biojava.bio.structure.scop.ScopDatabase;
@@ -17,6 +16,8 @@ import org.biojava.bio.structure.scop.ScopFactory;
 import org.biojava.bio.structure.scop.ScopNode;
 
 public class SuperfamilyRepresentatives extends Representatives {
+
+	private static final Logger logger = LogManager.getLogger(SuperfamilyRepresentatives.class.getPackage().getName());
 
 	private int[] sunIds;
 
@@ -36,13 +37,6 @@ public class SuperfamilyRepresentatives extends Representatives {
 		this.cache = cache;
 		this.repsPerSf = numReps;
 		this.sunIds = sunIds;
-	}
-
-	static final Logger logger = Logger.getLogger(SuperfamilyRepresentatives.class.getPackage().getName());
-
-	static {
-		BasicConfigurator.configure();
-		logger.setLevel(Level.DEBUG);
 	}
 
 	private static void getDomainsUnder(int sunId, List<ScopDomain> domains, Integer repsPerSf) {
