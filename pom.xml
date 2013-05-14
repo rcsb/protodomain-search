@@ -37,7 +37,65 @@
 	<dependency>
 		<groupId>org.biojava</groupId>
 		<artifactId>symmetry</artifactId>
-		<version>0.1.31-SNAPSHOT</version>
+		<version>0.1.32-SNAPSHOT</version>
 	</dependency>
   </dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+				<fork>true</fork>
+						<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+					<maxmem>2000m</maxmem>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+			</plugin>
+			<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.14.1</version>
+					<configuration>
+						<argLine>-Xms256m -Xmx2000M</argLine>
+					</configuration>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+				</includes>
+			</resource>
+		</resources>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.3</version>
+			</extension>
+		</extensions>
+	</build>
+	<scm>
+		<developerConnection>https://github.com/rcsb/protodomain-search</developerConnection>
+		<connection>git://github.com/rcsb/protodomain-search.git</connection>
+		<url>https://github.com/rcsb/protodomain-search</url>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/rcsb/protodomain-search/issues</url>
+		<system>Github</system>
+	</issueManagement>
 </project>
