@@ -7,5 +7,5 @@ public interface SearchResultSignificance {
 	public boolean isPossiblySignificant(Alignment alignment);
 	
 	public boolean isSignificant(Alignment alignment);
-	
+
 }

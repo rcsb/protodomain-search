@@ -16,5 +16,18 @@ public class SearchResultSignificanceFactory {
 			}
 		};
 	}
+
+	public static SearchResultSignificance medium() {
+		return new SearchResultSignificance() {
+			@Override
+			public boolean isPossiblySignificant(Alignment alignment) {
+				return alignment.getTmScore() >= 0.4;
+			}
+			@Override
+			public boolean isSignificant(Alignment alignment) {
+				return alignment.getTmScore() >= 0.4;
+			}
+		};
+	}
 	
 }
