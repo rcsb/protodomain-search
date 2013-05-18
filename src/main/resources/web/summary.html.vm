@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Summary</title>
+		<link rel="stylesheet" href="main.css" />
+		<script type="text/javascript" src="states.js"></script>
+	</head>
+	<body onload="setStates()">
+		<div id="content">
+			<h1>Summary</h1>
+			<h2>search run on ${search_date}; page generated on ${generation_date}</h2>
+			<p>
+				${search_description}
+			</p>
+			<figure>
+				<a href="all/tm-score.png"><img alt="TM-Score of all results" src="all/tm-score.png" /></a>
+				<a href="all/identity.png"><img alt="% identity of all results" src="all/identity.png" /></a>
+				<a href="all/similarity.png"><img alt="% similarity of all results" src="all/similarity.png" /></a>
+				<a href="all/order.png"><img alt="estimated order of internal symmetry of all results" src="all/order.png" /></a>
+				<a href="all/referred-length.png"><img alt="length of referred protodomains of all results" src="all/referred-length.png" /></a>
+				<a href="all/internal-length.png"><img alt="estimated length of internal symmetry protodomains of all results" src="all/internal-length.png" /></a>
+				<figcaption>from left to right: TM-score, % identity, and % similarity, order of internal symmetry (1 if none), referred length, and length of internal symmetry (0 if none)</figcaption>
+			</figure>
+			<form action="" method="post">
+			<table>
+				<colgroup>
+					<col span="5">
+					<col span="7">
+					<col span="1">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Rank (length)</th>
+						<th>Protodomain</th>
+						<th>SCOP classification</th>
+						<th>TM-score</th>
+						<th>Order of symmetry</th>
+						<th>Median TM-score</th>
+						<th>Median length</th>
+						<th>Median % identity</th>
+						<th>Median % similarity</th>
+						<th>Number of hits</th>
+						<th>Number of cross-fold hits</th>
+						<th>Number of symmetric hits</th>
+						<th>Notes</th>
+					</tr>
+				</thead>
+				<tbody>
+					#foreach($query in $queries)
+					<tr id="${query.domain}">
+						<td>${query.rank} <input onclick="saveState(&quot;symm&quot;, &quot;${query.domain}&quot;, this.checked)" id="${domain}__checkbox" type="checkbox" name="results[]" value="${rank}" /> (${query.protodomain_length})</td>
+						<td>
+							<a href="http://source.rcsb.org/jfatcatserver/showSymmetry.jsp?name1=${query.domain}">${query.protodomain}</a>
+							<a href="3d/${query.domain}.png"><img class="query_three_d" src="3d/${query.domain}.png" alt="" /></a>
+						</td>
+						<td>
+							<a href="http://www.pdb.org/pdb/explore/explore.do?structureId=${query.pdb_id}">${pdb_id}</a>
+							(<a href="http://scop.berkeley.edu/search/?key=${query.domain}">${query.domain} ${query.classification}</a>)
+						</td>
+						<td>${query.tm_score}</td>
+						<td>
+							<p>${query.order}</p>
+							<p id="order_${query.domain}" onblur="saveOrder(&quot;symm&quot;, &quot;${query.domain}&quot;, this)" contenteditable="true">-</p>
+						</td>
+						<td>${query.median.tm_score}</td>
+						<td>${query.median.protodomain_length}</td>
+						<td>${query.median.identity}</td>
+						<td>${query.median.similarity}</td>
+						<td><a href="${query.rank}.html">${query.rank}</a></td>
+						<td>${query.n_hits}</td>
+						<td>${query.n_symmetric_hits}</td>
+						<td onblur="saveDescription(&quot;symm&quot;, &quot;${query.domain}&quot;, this)" contenteditable="true" id="description_${query.domain}"></td>
+					</tr>
+					#end
+				</tbody>
+			</table>
+		<input type="hidden" id="query" value="symm" />
+		</form>
+		</div>
+	</body>
+</html>

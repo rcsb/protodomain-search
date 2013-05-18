@@ -1,0 +1,64 @@
+@media all {
+	* {
+		margin: 0;
+		padding: 0;
+		vertical-align: top;
+		font-family: sans-serif;
+		max-width: 100%;
+	}
+	body {
+		overflow: auto;
+		overflow-y: scroll;
+	}
+	nav#left {
+		margin-top: 1em;
+		float: left;
+	}
+	nav#right {
+		margin-top: 1em;
+		float: right;
+	}
+	h1 {
+		font-size: 1.8em;
+		text-align: center;
+	}
+	header {
+		margin-bottom: 1em;
+		width: 20%;
+		margin: 0 auto;
+	}
+	figure {
+		margin: 1em;
+	}
+	h2 {
+		font-size: 1.4em;
+		text-align: center;
+	}
+	table {
+		border-spacing: 0;
+		padding: 0;
+		margin: 0 auto;
+		border-color: black;
+		border-width: 1px;
+		border-style: solid;
+	}
+	tbody tr:nth-child(odd) {
+		background-color: #d9efef
+	}
+	tbody tr:nth-child(even) {
+	}
+	th {
+		padding: 0.2em;
+		margin: 0;
+		font-weight: bold;
+		text-align: left;
+	}
+	tr {
+		padding: 0;
+		margin: 0;
+	}
+	td,th {
+		padding: 0.8em;
+		margin: 0;
+	}
+}

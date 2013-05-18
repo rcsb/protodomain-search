@@ -1,0 +1,105 @@
+## Allows protodomain search results to be described and/or marked as false positives
+## by communicating (via AJAX) with a remote server.
+## This gives manual verification of locally stored search results persistent state.
+## Certainly not the most elegant thing I've written, but it works.
+psswd = "$states_password";
+the_url = "$states_url";
+
+#[[
+function setStates() {
+
+	query = document.getElementById("query").getAttribute("value");
+	xmlhttp = new XMLHttpRequest();
+
+	if (xmlhttp.withCredentials !== undefined) {
+		url = the_url + "states.html?query=" + query;
+		xmlhttp.open("GET", url);
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				modifyStates(xmlhttp.responseText);
+			}
+		}
+		xmlhttp.send();
+	}
+}
+
+function setOpacity(myElement, opacityValue) {
+    if (window.ActiveXObject) {
+        myElement.style.filter = "alpha(opacity=" + opacityValue*100 + ")"; // IE
+    } else {
+        myElement.style.opacity = opacityValue; // Gecko/Opera
+    }
+}
+
+function modifyStates(responseText) {
+	myQuery = document.getElementById("query").getAttribute("value");
+	if (responseText == "") return;
+	states = responseText.split("\\n");
+	for (i = 0; i < states.length; i++) {
+		state = states[i];
+		if (state.length == 0) continue;
+		parts = state.split("|");
+		id = parts[0];
+		result = parts[1];
+		status = parts[2];
+		description = parts[3];
+		order = parts[4];
+		if (query == myQuery) {
+			//alert(i + " : " + id + " " + result + " " + status + " " + description + " " + order + " " + document.getElementById(result) + " " + document.getElementById(result + "_checkbox"));
+			modifyState(document.getElementById(result), document.getElementById(result + "_checkbox"), status);
+			modifyDescription(document.getElementById("description_" + result), description);
+			modifyOrder(document.getElementById("order_" + result), order);
+		}
+	}
+}
+
+function modifyDescription(result, description) {
+	result.textContent = description;
+}
+
+function modifyOrder(result, order) {
+	result.textContent = order;
+}
+
+function modifyState(result, checkbox, status) {
+	if (status == 0) {
+		checkbox.checked = false;
+		result.removeAttribute("class");
+	} else if (status == 1) {
+		checkbox.checked = true;
+		result.setAttribute("class", "fp");
+	}
+}
+
+function saveState(query, result, status) {
+	x = 0;
+	if (status) x = 1;
+	save(query, result, "status", x, the_url + "set_status.do");
+	setStates();
+}
+
+function saveOrder(query, result, obj) {
+	save(query, result, "order", obj.textContent, the_url + "set_order.do");
+	setStates();
+}
+
+function saveDescription(query, result, obj) {
+	save(query, result, "description", obj.textContent, the_url + "set_description.do");
+	setStates();
+}
+
+function save(query, result, name, data, url) {
+	q = "query=" + query + "&result=" + result + "&" + "psswd=" + psswd + "&" + name + "=" + encodeURIComponent(data);
+	xmlhttp = new XMLHttpRequest();
+	if (xmlhttp.withCredentials !== undefined) {
+		xmlhttp.open("GET", url + "?" + q, true);
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				//xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				//xmlhttp.setRequestHeader("Connection", "close");
+			}
+		}
+		xmlhttp.send();
+	}
+}
+]]#

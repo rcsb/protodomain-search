@@ -1,0 +1,165 @@
+## A template for a webpage of protodomain search results
+## These webpages can be used for manual verification and documentation of search results
+#set($tm_score_cutoff = 0.4)
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Results for query ${query.domain}</title>
+		<link rel="stylesheet" href="main.css" />
+		<script type="text/javascript" src="states.js"></script>
+	</head>
+	<body onload="setStates()">
+		<div id="content">
+			<header>
+				<h1><a href="index.html">Search results</a></h1>
+				<h2>query protodomain ${query.protodomain} (${query.domain})</h2>
+				<nav id="left">
+					<a href="${query.prev_index}.html">prev</a>
+				</nav>
+				<nav id="right">
+					<a href="${query.next_index}.html">next</a>
+				</nav>
+				<a href="3d/${query.domain}.png"><img class="query_three_d" src="3d/${query.domain}.png" alt="" /></a>
+				<table class="properties">
+					<thead class="properties">
+						<tr class="properties">
+							<th class="properties">property name</th>
+							<th class="properties">property value</th>
+						</tr>
+					</thead>
+					<tbody class="properties">
+						<tr class="properties">
+							<td class="properties">protodomain (length)</td>
+							<td class="properties"><a href="http://source.rcsb.org/jfatcatserver/showSymmetry.jsp?name1=${query.domain}">${query.protodomain}</a> (${query.protodomain_length})</td>
+						</tr>
+						<tr class="properties">
+							<td class="properties">PDB Id (SCOP classification)</td>
+							<td class="properties"><a href="http://www.pdb.org/pdb/explore/explore.do?structureId=${query.pdb_id}">${query.pdb_id}</a>  (<a href="http://scop.berkeley.edu/search/?key=${query.domain}">${query.domain}</a> ${query.classification})</td>
+						</tr>
+						<tr class="properties">
+							<td class="properties">symmetry order</td>
+							<td class="properties">${query.order}</td>
+						</tr>
+						<tr class="properties">
+							<td class="properties">TM-Score</td>
+							<td class="properties">${query.tm_score}</td>
+						</tr>
+						<tr class="properties">
+							<td class="properties">% identity</td>
+							<td class="properties">${query.identity}%</td>
+						</tr>
+						<tr class="properties">
+							<td class="properties">% similarity</td>
+							<td class="properties">${query.similarity}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</header>
+			<figure>
+				<a href="./histograms/${query.domain}.z-score.png"><img src="histograms/${query.domain}.tm-score.png"  /></a>
+				<a href="./histograms/${query.domain}.identity.png"><img src="histograms/${query.domain}.identity.png" /></a>
+				<a href="./histograms/${query.domain}.similarity.png"><img src="histograms/${query.domain}.similarity.png" /></a>
+				<figcaption>from left to right: TM-score, % identity, and % similarity</figcaption>
+			</figure>
+			<form method="post">
+			<table>
+				<colgroup>
+					<col span="3">
+					<col span="2">
+					<col span="3">
+					<col span="1">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Rank</th>
+						<th>Result SCOP domain (classification)</th>
+						<th>Result protodomain (length)</th>
+						<th>protodomain–domain alignment</th>
+						<th>protodomain–domain alignment</th>
+						<th>domain–domain alignment</th>
+						<th>domain–domain alignment</th>
+						<th>symmetry alignment</th>
+						<th>symmetry order</th>
+						<th>symmetry protodomain (length)</th>
+						<th>notes</th>
+					</tr>
+				</thead>
+				<tbody>
+					#foreach($result in $results)
+					<tr id="${result.domain}">
+						<td>
+							${result.rank}
+							<input onclick="saveState(&quot;${query.domain}&quot;, &quot;${result.domain}&quot;, this.checked)" id="${result.domain}__checkbox" type="checkbox" name="results[]" value="${result.rank}" />
+						</td>
+						<td>
+							<a href="http://www.pdb.org/pdb/explore/explore.do?structureId=${result.pdb_id}">{result.pdb_id}</a>
+							(<a href="http://scop.berkeley.edu/search/?key=${result.domain}">${result.domain} ${result.classification}</a>)<br />
+							${result.description}
+						</td>
+						<td>
+							<a href="http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1=${query.protodomain}&amp;name2=${result.domain}">${result.referred.protodomain}</a> (${result.referred.length})
+							<a href="3d/${query.protodomain}/${result.domain}.png"><img class="three_d" src="3d/${query.protodomain}/${result.domain}.png" alt="" /></a>
+						</td>
+						<td>
+							TM-Score: ${result.referred.tm_score}<br />
+							% identity: ${result.referred.identity}%<br />
+							% similarity: ${result.referred.similarity}%<br />
+							% coverage: ${result.referred.coverage}%
+						</td>
+						<td>
+							<a href="http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1=${query.domain}&amp;name2=${result.domain}">${result.dd.protodomain}</a> (${result.dd.length})
+							<a href="3d/${query.domain}/${result.domain}.png"><img class="three_d" src="3d/${query.domain}/${result.domain}.png" alt="" /></a>
+						</td>
+						<td>
+							#if (${result.dd}) ## means not null
+							## a high TM-score for domain-domain is bad
+							#if (${result.dd.tm_score} < $tm_score_cutoff)
+								<strong>
+							#end
+							TM-Score: ${result.dd.tm_score}<br />
+							% identity: ${result.dd.identity}%<br />
+							% similarity: ${result.dd.similarity}%<br />
+							% coverage: ${result.dd.coverage}%
+							#if (${result.dd.tm_score} < $tm_score_cutoff)
+								</strong>
+							#end
+							#end
+						</td>
+						<td>
+							#if (${result.internal})
+							#if (${result.internal.tm_score} >= $tm_score_cutoff && ${result.internal.order} > 2)
+								<strong>
+							#end
+							TM-Score: ${result.internal.tm_score}<br />
+							% identity: ${result.internal.identity}%<br />
+							% similarity: ${result.internal.similarity}%<br />
+							% coverage: ${result.internal.coverage}%
+							#if (${result.internal.tm_score} >= ${tm_score_cutoff} && ${result.internal.order} > 2)
+								</strong>
+							#end
+							#end
+						</td>
+						<td>
+							#if (${result.internal})
+							#if (${result.internal.tm_score} >= $tm_score_cutoff && ${result.internal.order} > 2)
+								<strong>
+							#end
+							<p>${result.internal.order}</p>
+							<p id="order_${result.domain}" onblur="saveOrder(&quot;${query.domain}&quot;, &quot;${result.domain}&quot;, this)" contenteditable="true">-</p>
+							<a href="3d/${result.domain}.png"><img class="three_d" src="3d/${result.domain}.png" alt="" /></a>
+							#if (${result.internal.tm_score} >= $tm_score_cutoff && ${result.internal.order} > 2)
+								</strong>
+							#end
+							#end
+						</td>
+						<td onblur="saveDescription(&quot;${result.domain}&quot;, &quot;${result.domain}&quot;, this)" contenteditable="true" id="description_${result.domain}_"></td>
+					</tr>
+					#end
+				</tbody>
+			</table>
+			<input type="hidden" id="query" value="${query.domain}" />
+			</form>
+		</div>
+	</body>
+</html>
