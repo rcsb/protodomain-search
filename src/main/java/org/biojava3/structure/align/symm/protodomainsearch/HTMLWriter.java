@@ -59,14 +59,16 @@ public class HTMLWriter {
 			i++;
 		}
 		Map<String, Object> query = new HashMap<>();
-		query.put("query.domain", result.getQuery().getScopId());
-		query.put("query.classification", result.getQuery().getClassification());
-		query.put("query.pdb_id",
-				result.getQuery().getProtodomain().substring(result.getQuery().getProtodomain().indexOf('.')));
-		query.put("query.order", result.getQuery().getOrder());
-		query.put("query.description", result.getQuery().getDescription());
-		query.put("query.rank", result.getQuery().getRank());
-		putAlignment(query, "query", result.getQuery().getAlignment());
+		query.put("protodomain", result.getQuery().getProtodomain());
+		query.put("domain", result.getQuery().getScopId());
+		query.put("classification", result.getQuery().getClassification());
+		String pdbId = result.getQuery().getProtodomain().substring(0, result.getQuery().getProtodomain().indexOf('.'));
+		query.put("pdb_id", pdbId);
+		query.put("order", result.getQuery().getOrder());
+		query.put("description", result.getQuery().getDescription());
+		query.put("rank", result.getQuery().getRank());
+		query.put("align_length", result.getQuery().getAlignment().getAlignLength());
+		putAlignment(query, result.getQuery().getAlignment());
 
 		VelocityEngine ve = new VelocityEngine();
 		ve.init();
@@ -74,7 +76,7 @@ public class HTMLWriter {
 		context.put("results", discoveryData);
 		context.put("query", query);
 
-		Template template = ve.getTemplate("src/main/resources/web/query.vm");
+		Template template = ve.getTemplate("src/main/resources/web/query.html.vm", "UTF-8");
 		StringWriter writer = new StringWriter();
 		template.merge(context, writer);
 
@@ -93,31 +95,41 @@ public class HTMLWriter {
 
 	private Map<String, Object> getDiscovery(Discovery discovery, int rank) {
 		Map<String, Object> map = new HashMap<>();
+		map.put("pdb_id", Utils.getPdbId(discovery.getResult().getScopId()));
 		map.put("domain", discovery.getResult().getScopId());
 		map.put("rank", rank);
+		map.put("description", discovery.getResult().getDescription());
 		map.put("classification", discovery.getResult().getClassification());
-		map.put("pdb_id", discovery.getProtodomain().substring(discovery.getProtodomain().indexOf('.')));
-		map.put("referred.protodomain", discovery.getProtodomain());
-		putAlignment(map, "referred", discovery.getAlignment());
+		map.put("pdb_id", discovery.getProtodomain().substring(0, discovery.getProtodomain().indexOf('.')));
+		Map<String, Object> referred = new HashMap<>();
+		map.put("referred", referred);
+		referred.put("protodomain", discovery.getProtodomain());
+		putAlignment(referred, discovery.getAlignment());
 		if (discovery.getDomainDomain() == null) {
 			map.put("dd", null);
 		} else {
-			putAlignment(map, "dd", discovery.getDomainDomain());
+			Map<String, Object> dd = new HashMap<>();
+			map.put("dd", dd);
+			putAlignment(dd, discovery.getDomainDomain());
 		}
 		if (discovery.getResult().getAlignment() == null) {
 			map.put("internal", null);
 		} else {
-			map.put("internal.protodomain", discovery.getResult().getProtodomain());
-			map.put("internal.order", discovery.getResult().getOrder());
-			putAlignment(map, "internal", discovery.getResult().getAlignment());
+			Map<String, Object> internal = new HashMap<>();
+			map.put("internal", internal);
+			internal.put("protodomain", discovery.getResult().getProtodomain());
+			internal.put("order", discovery.getResult().getOrder());
+			putAlignment(internal, discovery.getResult().getAlignment());
 		}
 		return map;
 	}
 
-	private void putAlignment(Map<String, Object> map, String prefix, Alignment alignment) {
-		map.put(prefix + ".tm_score", alignment.getTmScore());
-		map.put(prefix + ".similarity", alignment.getSimilarity());
-		map.put(prefix + ".identity", alignment.getIdentity());
+	private void putAlignment(Map<String, Object> map, Alignment alignment) {
+		map.put("tm_score", Utils.formatDecimal(alignment.getTmScore(), 3));
+		map.put("similarity", Utils.formatPercentage(alignment.getSimilarity()));
+		map.put("identity", Utils.formatPercentage(alignment.getIdentity()));
+		map.put("align_length", alignment.getAlignLength());
+		map.put("coverage", alignment.getCoverage());
 	}
 
 	private void writeSummary(SearchResults results, File file) throws IOException {
@@ -128,7 +140,7 @@ public class HTMLWriter {
 		ArrayList<Map<String, Object>> queryData = new ArrayList<>();
 		context.put("queries", queryData);
 
-		Template template = ve.getTemplate("src/main/resources/web/summary.vm");
+		Template template = ve.getTemplate("src/main/resources/web/summary.html.vm", "UTF-8");
 		StringWriter writer = new StringWriter();
 		template.merge(context, writer);
 

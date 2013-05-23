@@ -31,11 +31,19 @@
 					<tbody class="properties">
 						<tr class="properties">
 							<td class="properties">protodomain (length)</td>
-							<td class="properties"><a href="http://source.rcsb.org/jfatcatserver/showSymmetry.jsp?name1=${query.domain}">${query.protodomain}</a> (${query.protodomain_length})</td>
+							<td class="properties"><a href="http://source.rcsb.org/jfatcatserver/showSymmetry.jsp?name1=${query.domain}">${query.protodomain}</a> (${query.align_length})</td>
 						</tr>
 						<tr class="properties">
-							<td class="properties">PDB Id (SCOP classification)</td>
+							<td class="properties">PDB Id</td>
 							<td class="properties"><a href="http://www.pdb.org/pdb/explore/explore.do?structureId=${query.pdb_id}">${query.pdb_id}</a>  (<a href="http://scop.berkeley.edu/search/?key=${query.domain}">${query.domain}</a> ${query.classification})</td>
+						</tr>
+						<tr class="properties">
+							<td class="properties">SCOP domain</td>
+							<td class="properties"><a href="http://scop.berkeley.edu/search/?key=${query.domain}">${query.domain}</a> (${query.classification})</td>
+						</tr>
+						<tr class="properties">
+							<td class="properties">PDB description</td>
+							<td class="properties">${query.description}</td>
 						</tr>
 						<tr class="properties">
 							<td class="properties">symmetry order</td>
@@ -46,12 +54,12 @@
 							<td class="properties">${query.tm_score}</td>
 						</tr>
 						<tr class="properties">
-							<td class="properties">% identity</td>
-							<td class="properties">${query.identity}%</td>
+							<td class="properties">identity</td>
+							<td class="properties">${query.identity}</td>
 						</tr>
 						<tr class="properties">
-							<td class="properties">% similarity</td>
-							<td class="properties">${query.similarity}%</td>
+							<td class="properties">similarity</td>
+							<td class="properties">${query.similarity}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -60,7 +68,7 @@
 				<a href="./histograms/${query.domain}.z-score.png"><img src="histograms/${query.domain}.tm-score.png"  /></a>
 				<a href="./histograms/${query.domain}.identity.png"><img src="histograms/${query.domain}.identity.png" /></a>
 				<a href="./histograms/${query.domain}.similarity.png"><img src="histograms/${query.domain}.similarity.png" /></a>
-				<figcaption>from left to right: TM-score, % identity, and % similarity</figcaption>
+				##<figcaption>from left to right: TM-score, identity, and similarity</figcaption>
 			</figure>
 			<form method="post">
 			<table>
@@ -76,8 +84,6 @@
 						<th>Result SCOP domain (classification)</th>
 						<th>Result protodomain (length)</th>
 						<th>protodomain–domain alignment</th>
-						<th>protodomain–domain alignment</th>
-						<th>domain–domain alignment</th>
 						<th>domain–domain alignment</th>
 						<th>symmetry alignment</th>
 						<th>symmetry order</th>
@@ -93,37 +99,28 @@
 							<input onclick="saveState(&quot;${query.domain}&quot;, &quot;${result.domain}&quot;, this.checked)" id="${result.domain}__checkbox" type="checkbox" name="results[]" value="${result.rank}" />
 						</td>
 						<td>
-							<a href="http://www.pdb.org/pdb/explore/explore.do?structureId=${result.pdb_id}">{result.pdb_id}</a>
+							<a href="http://www.pdb.org/pdb/explore/explore.do?structureId=${result.pdb_id}">{result.pdb_id}</a><br />
 							(<a href="http://scop.berkeley.edu/search/?key=${result.domain}">${result.domain} ${result.classification}</a>)<br />
 							${result.description}
 						</td>
 						<td>
-							<a href="http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1=${query.protodomain}&amp;name2=${result.domain}">${result.referred.protodomain}</a> (${result.referred.length})
+							<a href="http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1=${query.protodomain}&amp;name2=${result.domain}">${result.referred.protodomain}</a>
+							(${result.referred.align_length})
 							<a href="3d/${query.protodomain}/${result.domain}.png"><img class="three_d" src="3d/${query.protodomain}/${result.domain}.png" alt="" /></a>
 						</td>
 						<td>
 							TM-Score: ${result.referred.tm_score}<br />
-							% identity: ${result.referred.identity}%<br />
-							% similarity: ${result.referred.similarity}%<br />
-							% coverage: ${result.referred.coverage}%
+							identity: ${result.referred.identity}<br />
+							similarity: ${result.referred.similarity}<br />
+							coverage: ${result.referred.coverage}
 						</td>
 						<td>
-							<a href="http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1=${query.domain}&amp;name2=${result.domain}">${result.dd.protodomain}</a> (${result.dd.length})
-							<a href="3d/${query.domain}/${result.domain}.png"><img class="three_d" src="3d/${query.domain}/${result.domain}.png" alt="" /></a>
-						</td>
-						<td>
-							#if (${result.dd}) ## means not null
-							## a high TM-score for domain-domain is bad
-							#if (${result.dd.tm_score} < $tm_score_cutoff)
-								<strong>
-							#end
+							#if (${result.dd})
+							<a href="http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1=${query.domain}&amp;name2=${result.domain}">alignment</a><br />
 							TM-Score: ${result.dd.tm_score}<br />
-							% identity: ${result.dd.identity}%<br />
-							% similarity: ${result.dd.similarity}%<br />
-							% coverage: ${result.dd.coverage}%
-							#if (${result.dd.tm_score} < $tm_score_cutoff)
-								</strong>
-							#end
+							identity: ${result.dd.identity}<br />
+							similarity: ${result.dd.similarity}<br />
+							coverage: ${result.dd.coverage}
 							#end
 						</td>
 						<td>
@@ -132,9 +129,9 @@
 								<strong>
 							#end
 							TM-Score: ${result.internal.tm_score}<br />
-							% identity: ${result.internal.identity}%<br />
-							% similarity: ${result.internal.similarity}%<br />
-							% coverage: ${result.internal.coverage}%
+							identity: ${result.internal.identity}<br />
+							similarity: ${result.internal.similarity}<br />
+							coverage: ${result.internal.coverage}
 							#if (${result.internal.tm_score} >= ${tm_score_cutoff} && ${result.internal.order} > 2)
 								</strong>
 							#end
@@ -145,8 +142,29 @@
 							#if (${result.internal.tm_score} >= $tm_score_cutoff && ${result.internal.order} > 2)
 								<strong>
 							#end
-							<p>${result.internal.order}</p>
+							#if (${result.internal.order})
+								<p>${result.internal.order}</p>
+							#else
+								<p>−1</p>
+							#end
 							<p id="order_${result.domain}" onblur="saveOrder(&quot;${query.domain}&quot;, &quot;${result.domain}&quot;, this)" contenteditable="true">-</p>
+							<a href="3d/${result.domain}.png"><img class="three_d" src="3d/${result.domain}.png" alt="" /></a>
+							#if (${result.internal.tm_score} >= $tm_score_cutoff && ${result.internal.order} > 2)
+								</strong>
+							#end
+							#end
+						</td>
+						<td>
+							#if (${result.internal})
+							#if (${result.internal.tm_score} >= $tm_score_cutoff && ${result.internal.order} > 2)
+								<strong>
+							#end
+							#if (${result.internal.protodomain})
+							<a href="http://source.rcsb.org/jfatcatserver/showSymmetry.jsp?name1=${result.domain}">${result.internal.protodomain}</a>
+							#else
+								unknown
+							#end
+							(${result.internal.align_length})
 							<a href="3d/${result.domain}.png"><img class="three_d" src="3d/${result.domain}.png" alt="" /></a>
 							#if (${result.internal.tm_score} >= $tm_score_cutoff && ${result.internal.order} > 2)
 								</strong>

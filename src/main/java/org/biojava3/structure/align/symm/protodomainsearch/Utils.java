@@ -10,12 +10,15 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.align.ce.AbstractUserArgumentProcessor;
 import org.biojava.bio.structure.align.util.AtomCache;
 import org.biojava.bio.structure.scop.BerkeleyScopInstallation;
 import org.biojava.bio.structure.scop.ScopDatabase;
+import org.biojava.bio.structure.scop.ScopDomain;
 import org.biojava.bio.structure.scop.ScopFactory;
 
 public class Utils {
@@ -47,7 +50,7 @@ public class Utils {
 	}
 
 	private static Utils me;
-	
+
 	public static Utils getInstance() {
 		if (Utils.me == null) throw new IllegalStateException("Must set instance first");
 		return me;
@@ -135,16 +138,50 @@ public class Utils {
 		}
 	}
 
+	private static final Logger logger = LogManager.getLogger(Utils.class.getName());
+
+	/**
+	 * Tries to return the PDB description. Just logs and returns the string "unknown" on error.
+	 */
+	public static String getDescription(String name) {
+		try {
+			AtomCache cache = new AtomCache();
+			String description = cache.getStructure(name).getPDBHeader().getDescription();
+			description = description.split("\\|")[1].substring(1);
+		} catch (Exception e) {
+			logger.warn("Couldn't get PDB header or structure for " + name, e);
+		}
+		return "unknown";
+	}
+
+	/**
+	 * Tries to return the PDB Id. Just logs and returns the string "unknown" on error.
+	 */
+	public static String getPdbId(String scopId) {
+		ScopDatabase scop = ScopFactory.getSCOP(ScopFactory.VERSION_1_75B);
+		ScopDomain domain = scop.getDomainByScopID(scopId);
+		if (domain == null) return "unknown";
+		return domain.getPdbId();
+	}
+	
 	public static String formatDecimal(double number) {
+		return formatDecimal(number, 2);
+	}
+	public static String formatDecimal(double number, int nDigits) {
 		NumberFormat nf = new DecimalFormat();
-		nf.setMaximumFractionDigits(3);
-		return nf.format(number);
+		nf.setMaximumFractionDigits(nDigits);
+		String complete = nf.format(number);
+		return complete.replace('-', '−'); // extreme OCD
 	}
 
 	public static String formatPercentage(double number) {
+		return formatPercentage(number, 2);
+	}
+	public static String formatPercentage(double number, int nDigits) {
 		NumberFormat nf = new DecimalFormat();
-		nf.setMaximumFractionDigits(3);
-		return nf.format(number*100.0) + "%";
+		nf.setMaximumFractionDigits(nDigits);
+		String complete = nf.format(number*100.0) + "%";
+		return complete.replace('-', '−'); // extreme OCD
 	}
 
 	public static boolean sanityCheckPreAlign(Atom[] ca1, Atom[] ca2) {
@@ -175,7 +212,7 @@ public class Utils {
 		String secs = "and " + millis / 1000 % 60 + " seconds.";
 		return hrs + mins + secs;
 	}
-	
+
 	/**
 	 * Converts space indentation to tab indentation, assuming no lines have trailing whitespace.
 	 * @param input
