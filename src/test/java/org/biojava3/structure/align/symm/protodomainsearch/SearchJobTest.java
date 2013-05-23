@@ -1,6 +1,7 @@
 package org.biojava3.structure.align.symm.protodomainsearch;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,8 +13,10 @@ import org.biojava.bio.structure.align.StructureAlignment;
 import org.biojava.bio.structure.align.ce.CeMain;
 import org.biojava.bio.structure.scop.ScopDatabase;
 import org.biojava.bio.structure.scop.ScopDomain;
+import org.biojava.bio.structure.scop.ScopFactory;
 import org.biojava3.structure.align.symm.CeSymm;
 import org.biojava3.structure.align.symm.ResourceList;
+import org.biojava3.structure.align.symm.ResourceList.ElementTextIgnoringDifferenceListener;
 import org.biojava3.structure.align.symm.ResourceList.NameProvider;
 import org.biojava3.structure.align.symm.census2.Census.AlgorithmGiver;
 import org.biojava3.structure.align.symm.census2.Result;
@@ -43,7 +46,7 @@ public class SearchJobTest {
 		if (!Utils.isSet()) Utils.setInstance(new Utils());
 		Representatives reps = new NamesRepresentatives(names);
 		SearchJob job = new SearchJob(result, reps);
-		ScopDatabase scop = Utils.setBerkeleyScop();
+		ScopDatabase scop = ScopFactory.getSCOP(ScopFactory.VERSION_1_75B);
 		ScopDomain domain = scop.getDomainByScopID(result.getScopId());
 		job.setQueryDomain(domain);
 		job.setAlgorithm(new AlgorithmGiver() {
@@ -71,6 +74,8 @@ public class SearchJobTest {
 
 	@Test
 	public void test() throws Exception {
+		
+		// run the job
 		File inputCensus = ResourceList.get().openFile("protodomainsearch/1_query.xml");
 		Result result = Results.fromXML(inputCensus).getData().get(0);
 		SearchJob job = forTest(result, "d2jaja_", "d2dsmb1");
@@ -81,23 +86,19 @@ public class SearchJobTest {
 		}
 		SearchResults results = new SearchResults();
 		results.add(searchResult);
+		
+		// write the results
+		File actualFile = new File("actual1querysearchresults.xml");
+//		actualFile.deleteOnExit();
+		BufferedWriter bw = new BufferedWriter(new FileWriter(actualFile));
+		bw.write(results.toXML());
+		bw.close();
+		
+		// now compare the XML
 		File expectedFile = ResourceList.get().openFile("protodomainsearch/1_query_search_results.xml");
-		SearchResults expected = SearchResults.fromXML(expectedFile);
-		assertEquals(expected.getData().size(), results.getData().size());
-//		String xml = results.toXML();
-//		File output = ResourceList.get().openFile("protodomainsearch/1_query_search_results.xml.tmp");
-//		BufferedWriter bw = new BufferedWriter(new FileWriter(output));
-//		bw.write(xml);
-//		bw.flush();
-//		bw.close();
-		for (int i = 0; i < expected.getData().size(); i++) {
-			SearchResult a = expected.getData().get(i);
-			SearchResult b = results.getData().get(i);
-			assertEquals(a.getDiscoveries().size(), b.getDiscoveries().size());
-			for (int j = 0; j < a.getDiscoveries().size(); j++) {
-				assertEquals(a.getDiscoveries().get(j), b.getDiscoveries().get(j));
-			}
-		}
+		ElementTextIgnoringDifferenceListener listener = new ElementTextIgnoringDifferenceListener("timestamp");
+		boolean similar = ResourceList.compareXml(expectedFile, actualFile, listener);
+		assertTrue("XML output differs", similar);
 	}
 
 }
