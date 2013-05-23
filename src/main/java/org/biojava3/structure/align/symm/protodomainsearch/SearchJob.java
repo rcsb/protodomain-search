@@ -107,28 +107,31 @@ public class SearchJob implements Callable<SearchResult> {
 						}
 					}
 					if (checkDiscoveryDomain) {
-						{
+						DBAlignment aln = null;
+						try {
 							PdbPair pair = new PdbPair(queryScopId, domain.getScopId());
-							DBAlignment aln = AlignmentCache.getInstance().getDbAlignment(pair);
-							if (aln == null) {
-								try {
-									AFPChain domainDomainAfpChain = alignDomainDomain(queryDomain, domain);
-									domainDomain = new Alignment(domainDomainAfpChain);
-								} catch (RuntimeException e) {
-									logger.error("Failed aligning " + queryScopId + " against " + domain.getScopId(), e);
-								}
-							} else {
-								domainDomain = new Alignment();
-								domainDomain.setRmsd(aln.getRmsdOpt());
-								domainDomain.setAlignScore(aln.getScore());
-								domainDomain.setIdentity((float) (aln.getID() / 100.0));
-								domainDomain.setSimilarity((float) (aln.getSim1() / 100.0));
-								Double tmScore = aln.getTmScore();
-								if (tmScore != null) {
-									domainDomain.setTmScore((float) (double) tmScore);
-								}
-								domainDomain.setzScore(aln.getProbability());
+							aln = AlignmentCache.getInstance().getDbAlignment(pair);
+						} catch (RuntimeException e) {
+							logger.error("Failed getting cached result on " + domain.getScopId(), e);
+						}
+						if (aln == null) {
+							try {
+								AFPChain domainDomainAfpChain = alignDomainDomain(queryDomain, domain);
+								domainDomain = new Alignment(domainDomainAfpChain);
+							} catch (RuntimeException e) {
+								logger.error("Failed aligning " + queryScopId + " against " + domain.getScopId(), e);
 							}
+						} else {
+							domainDomain = new Alignment();
+							domainDomain.setRmsd(aln.getRmsdOpt());
+							domainDomain.setAlignScore(aln.getScore());
+							domainDomain.setIdentity((float) (aln.getID() / 100.0));
+							domainDomain.setSimilarity((float) (aln.getSim1() / 100.0));
+							Double tmScore = aln.getTmScore();
+							if (tmScore != null) {
+								domainDomain.setTmScore((float) (double) tmScore);
+							}
+							domainDomain.setzScore(aln.getProbability());
 						}
 					}
 				}
@@ -230,12 +233,12 @@ public class SearchJob implements Callable<SearchResult> {
 	}
 
 	private AFPChain alignDomainDomain(ScopDomain queryDomain, ScopDomain domain) throws IOException,
-			StructureException {
+	StructureException {
 		return align(queryDomain.getScopId(), domain.getScopId(), algorithm);
 	}
 
 	private AFPChain alignProtodomainDomain(String protodomain, ScopDomain domain, Atom[] ca2) throws IOException,
-			StructureException {
+	StructureException {
 		Atom[] ca1 = cache.getAtoms(protodomain);
 		return align(protodomain, domain.getScopId(), ca1, ca2, algorithm.getAlgorithm());
 	}
