@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.biojava.bio.structure.scop.ScopDatabase;
 import org.biojava.bio.structure.scop.ScopDomain;
+import org.biojava.bio.structure.scop.ScopFactory;
 
 public class NamesRepresentatives extends Representatives {
 
@@ -19,7 +20,7 @@ public class NamesRepresentatives extends Representatives {
 	}
 	
 	public NamesRepresentatives(List<String> names) {
-		ScopDatabase scop = Utils.setBerkeleyScop();
+		ScopDatabase scop = ScopFactory.getSCOP(ScopFactory.VERSION_1_75B);
 		domains = new ArrayList<ScopDomain>();
 		for (String name : names) {
 			domains.add(scop.getDomainByScopID(name));
