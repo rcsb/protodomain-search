@@ -12,11 +12,13 @@ import java.util.TreeSet;
 
 public class Rescorer {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) throws IOException {
+		if (args.length != 2) {
+			System.err.println("Usage: " + Rescorer.class.getSimpleName() + " input-file output-file [scorer-factory-method]");
+			return;
+		}
+		Rescorer rescorer = new Rescorer(DiscoveryScorerFactory.sensible());
+		rescorer.rescore(new File(args[0]), new File(args[1]));
 	}
 
 	private DiscoveryScorer scorer;
