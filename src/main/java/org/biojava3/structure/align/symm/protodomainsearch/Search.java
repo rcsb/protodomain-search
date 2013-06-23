@@ -57,21 +57,21 @@ public class Search {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length != 3) {
-			System.err.println("Usage: Search pdb-dir census-file output-file");
+			System.err.println("Usage: " + Search.class.getSimpleName() + " census-file output-file");
 			return;
 		}
-		final String pdbDir = args[0];
 		final File census = new File(args[1]);
 		final File output = new File(args[2]);
-		searchDefault(pdbDir, census, output);
+		searchDefault(census, output);
 	}
 
-	public static void searchDefault(String pdbDir, File census, File output) {
+	public static void searchDefault(File census, File output) {
 		try {
-			Utils.setInstance(new Utils(new AtomCache(pdbDir, false)));
-			Utils.setBerkeleyScop(pdbDir);
+			AtomCache cache = new AtomCache();
+			Utils.setInstance(new Utils(cache));
+			ScopFactory.setScopDatabase(ScopFactory.getSCOP(ScopFactory.VERSION_1_75A));
 			Search search = new Search(census);
-			search.setCache(new AtomCache(pdbDir, false));
+			search.setCache(cache);
 			search.setOutputFile(output);
 			search.search();
 		} catch (IOException e) {

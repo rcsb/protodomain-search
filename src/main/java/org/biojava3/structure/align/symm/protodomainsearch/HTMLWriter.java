@@ -36,7 +36,7 @@ public class HTMLWriter {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length != 2) {
-			System.err.println("Usage: HTMLWriter results-file output-dir");
+			System.err.println("Usage: " + HTMLWriter.class.getSimpleName() + " results-file output-dir");
 			return;
 		}
 		SearchResults results = SearchResults.fromXML(args[0]);

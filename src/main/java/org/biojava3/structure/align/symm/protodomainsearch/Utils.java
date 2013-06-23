@@ -80,15 +80,6 @@ public class Utils {
 		return r;
 	}
 
-	public static ScopDatabase setBerkeleyScop(String pdbDir) {
-		System.setProperty(AbstractUserArgumentProcessor.PDB_DIR, pdbDir);
-		ScopDatabase scop = ScopFactory.getSCOP();
-		if (!scop.getClass().getName().equals(BerkeleyScopInstallation.class.getName())) { // for efficiency
-			ScopFactory.setScopDatabase(new BerkeleyScopInstallation());
-		}
-		return ScopFactory.getSCOP();
-	}
-
 	public static String linkifyScopClassification(String scopId, String scopClassification) {
 		return "<a href=\"http://scop.berkeley.edu/search/?key=" + scopId + "\">" + scopClassification + "</a>";
 	}
