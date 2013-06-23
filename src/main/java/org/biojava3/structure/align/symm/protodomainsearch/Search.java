@@ -25,6 +25,7 @@ import org.biojava3.structure.align.symm.census2.Result;
 import org.biojava3.structure.align.symm.census2.Results;
 import org.biojava3.structure.align.symm.census2.Significance;
 import org.biojava3.structure.align.symm.census2.SignificanceFactory;
+import org.biojava3.structure.align.symm.census2.representatives.Representatives;
 
 public class Search {
 

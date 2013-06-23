@@ -22,6 +22,7 @@ import org.biojava3.structure.align.symm.census2.Census.AlgorithmGiver;
 import org.biojava3.structure.align.symm.census2.CensusJob;
 import org.biojava3.structure.align.symm.census2.Result;
 import org.biojava3.structure.align.symm.census2.Significance;
+import org.biojava3.structure.align.symm.census2.representatives.Representatives;
 import org.biojava3.structure.align.symm.protodomain.Protodomain;
 import org.rcsb.fatcat.server.dao.DBAlignment;
 import org.rcsb.fatcat.server.util.AlignmentCache;

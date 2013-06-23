@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>org.biojava</groupId>
 			<artifactId>symmetry</artifactId>
-			<version>0.1.32-SNAPSHOT</version>
+			<version>0.2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>

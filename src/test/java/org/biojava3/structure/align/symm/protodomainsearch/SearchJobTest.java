@@ -22,6 +22,8 @@ import org.biojava3.structure.align.symm.census2.Census.AlgorithmGiver;
 import org.biojava3.structure.align.symm.census2.Result;
 import org.biojava3.structure.align.symm.census2.Results;
 import org.biojava3.structure.align.symm.census2.SignificanceFactory;
+import org.biojava3.structure.align.symm.census2.representatives.NamesRepresentatives;
+import org.biojava3.structure.align.symm.census2.representatives.Representatives;
 import org.junit.Before;
 import org.junit.Test;
 
