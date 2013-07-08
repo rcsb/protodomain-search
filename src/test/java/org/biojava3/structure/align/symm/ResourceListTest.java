@@ -23,7 +23,7 @@ public class ResourceListTest {
 	@Test
 	public void testSequentially() {
 		NameProvider provider = NameProvider.defaultNameProvider();
-		ResourceList.set(provider, ResourceList.DEFAULT_PDB_DIR);
+		ResourceList.set(provider);
 		StructureAlignment ceSymm = new CeSymm();
 		StructureAlignment ce = new CeMain();
 		StructureAlignment ceCp = new CeCPMain();

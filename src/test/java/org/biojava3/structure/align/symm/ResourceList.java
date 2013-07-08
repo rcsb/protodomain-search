@@ -48,9 +48,7 @@ import org.biojava.bio.structure.align.util.AtomCache;
 import org.biojava.bio.structure.align.xml.AFPChainXMLConverter;
 import org.biojava.bio.structure.align.xml.AFPChainXMLParser;
 import org.biojava.bio.structure.scop.BerkeleyScopInstallation;
-import org.biojava.bio.structure.scop.ScopDatabase;
 import org.biojava.bio.structure.scop.ScopFactory;
-import org.biojava3.structure.align.symm.CeSymm;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
@@ -178,20 +176,11 @@ public class ResourceList {
 
 	public static final String DEFAULT_DIR = "src/test/resources/";
 
-	/**
-	 * Null means use the AtomCache default.
-	 */
-	public static final String DEFAULT_PDB_DIR = null;
-
 	private static ResourceList singleton;
 
 	static {
 		StructureAlignmentFactory.addAlgorithm(new CeMain());
 		StructureAlignmentFactory.addAlgorithm(new CeCPMain());
-		ScopDatabase scop = ScopFactory.getSCOP();
-		if (!scop.getClass().getName().equals(BerkeleyScopInstallation.class.getName())) { // for efficiency
-			ScopFactory.setScopDatabase(new BerkeleyScopInstallation()); // ScopDatabase is too hard to mock well
-		}
 	}
 
 	// notice the side effects here
@@ -245,12 +234,9 @@ public class ResourceList {
 	 * Sets the singleton ResourceList to a new ResourceList with the given NameProvider and PDB directory. As a
 	 * <em>side effect calls {@link ScopFactory#setScopDatabase(org.biojava.bio.structure.scop.ScopDatabase)}</em>.
 	 */
-	public static void set(NameProvider nameProvider, String pdbDir) {
-		ResourceList.singleton = new ResourceList(nameProvider, pdbDir);
-		ScopDatabase scop = ScopFactory.getSCOP();
-		if (!scop.getClass().getName().equals(BerkeleyScopInstallation.class.getName())) { // for efficiency
-			ScopFactory.setScopDatabase(new BerkeleyScopInstallation()); // ScopDatabase is too hard to mock well
-		}
+	public static void set(NameProvider nameProvider) {
+		ResourceList.singleton = new ResourceList(nameProvider);
+		ScopFactory.setScopDatabase(ScopFactory.VERSION_1_75A);
 	}
 
 	private static AFPChain fromXML(File file, String nameA, String nameB, Atom[] ca1, Atom[] ca2) throws IOException,
@@ -270,13 +256,9 @@ public class ResourceList {
 
 	private NameProvider nameProvider;
 
-	private ResourceList(NameProvider nameProvider, String pdbDir) {
+	private ResourceList(NameProvider nameProvider) {
 		this.nameProvider = nameProvider;
-		if (pdbDir == null) {
-			cache = new AtomCache();
-		} else {
-			cache = new AtomCache(pdbDir, false);
-		}
+		cache = new AtomCache();
 	}
 
 	public Atom[] getAtoms(String name) {

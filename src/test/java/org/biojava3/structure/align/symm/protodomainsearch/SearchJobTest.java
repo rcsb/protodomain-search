@@ -32,7 +32,7 @@ public class SearchJobTest {
 
 	@Before
 	public void setUp() throws StructureException {
-		ResourceList.set(NameProvider.defaultNameProvider(), ResourceList.DEFAULT_PDB_DIR);
+		ResourceList.set(NameProvider.defaultNameProvider());
 	}
 	
 	static SearchJob forTest(String queryFile, String... names) {
@@ -48,7 +48,7 @@ public class SearchJobTest {
 		if (!Utils.isSet()) Utils.setInstance(new Utils());
 		Representatives reps = new NamesRepresentatives(names);
 		SearchJob job = new SearchJob(result, reps);
-		ScopDatabase scop = ScopFactory.getSCOP(ScopFactory.VERSION_1_75B);
+		ScopDatabase scop = ScopFactory.getSCOP(ScopFactory.VERSION_1_75A);
 		ScopDomain domain = scop.getDomainByScopID(result.getScopId());
 		job.setQueryDomain(domain);
 		job.setAlgorithm(new AlgorithmGiver() {

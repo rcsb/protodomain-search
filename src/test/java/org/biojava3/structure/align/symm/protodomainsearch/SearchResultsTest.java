@@ -16,7 +16,7 @@ public class SearchResultsTest {
 
 	@Before
 	public void setUp() throws StructureException {
-		ResourceList.set(NameProvider.defaultNameProvider(), ResourceList.DEFAULT_PDB_DIR);
+		ResourceList.set(NameProvider.defaultNameProvider());
 	}
 	
 	@Test
