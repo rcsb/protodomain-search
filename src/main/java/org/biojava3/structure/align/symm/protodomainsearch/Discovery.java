@@ -5,60 +5,23 @@ import java.io.Serializable;
 import org.biojava3.structure.align.symm.census2.Alignment;
 import org.biojava3.structure.align.symm.census2.Result;
 
+/**
+ * One query–target pair from the search.
+ * 
+ * @author dmyerstu
+ * @see SearchResult, which contains multiple Discoveries
+ */
 public class Discovery implements Serializable {
 
 	private static final long serialVersionUID = 6933505297004465548L;
 
-	private Result result;
-	
 	private Alignment alignment;
-	
-	private String protodomain;
-	
+
 	private Alignment domainDomain;
 
-	public Alignment getDomainDomain() {
-		return domainDomain;
-	}
+	private String protodomain;
 
-	public void setDomainDomain(Alignment domainDomain) {
-		this.domainDomain = domainDomain;
-	}
-
-	public String getProtodomain() {
-		return protodomain;
-	}
-
-	public void setProtodomain(String protodomain) {
-		this.protodomain = protodomain;
-	}
-
-	public Result getResult() {
-		return result;
-	}
-
-	public void setResult(Result result) {
-		this.result = result;
-	}
-
-	public Alignment getAlignment() {
-		return alignment;
-	}
-
-	public void setAlignment(Alignment alignment) {
-		this.alignment = alignment;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((alignment == null) ? 0 : alignment.hashCode());
-		result = prime * result + ((domainDomain == null) ? 0 : domainDomain.hashCode());
-		result = prime * result + ((protodomain == null) ? 0 : protodomain.hashCode());
-		result = prime * result + ((this.result == null) ? 0 : this.result.hashCode());
-		return result;
-	}
+	private Result result;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -81,10 +44,68 @@ public class Discovery implements Serializable {
 		return true;
 	}
 
+	/**
+	 * The Alignment between the query protodomain and the target domain.
+	 */
+	public Alignment getAlignment() {
+		return alignment;
+	}
+
+	/**
+	 * The Alignment between the query domain and the target domain. Frequently, good scores for this are considered
+	 * bad.
+	 */
+	public Alignment getDomainDomain() {
+		return domainDomain;
+	}
+
+	/**
+	 * A String representation of the result protodomain referred by the query protodomain onto the target domain. In
+	 * other words, this is the protodomain that corresponds to the {@link #getAlignment() alignment} between the query
+	 * protodomain and target domain.
+	 */
+	public String getProtodomain() {
+		return protodomain;
+	}
+
+	/**
+	 * The symmetry result of the query that led to this Discovery.
+	 */
+	public Result getResult() {
+		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (alignment == null ? 0 : alignment.hashCode());
+		result = prime * result + (domainDomain == null ? 0 : domainDomain.hashCode());
+		result = prime * result + (protodomain == null ? 0 : protodomain.hashCode());
+		result = prime * result + (this.result == null ? 0 : this.result.hashCode());
+		return result;
+	}
+
+	public void setAlignment(Alignment alignment) {
+		this.alignment = alignment;
+	}
+
+	public void setDomainDomain(Alignment domainDomain) {
+		this.domainDomain = domainDomain;
+	}
+
+	public void setProtodomain(String protodomain) {
+		this.protodomain = protodomain;
+	}
+
+	public void setResult(Result result) {
+		this.result = result;
+	}
+
 	@Override
 	public String toString() {
 		return "Discovery [result=" + result + ", alignment=" + alignment + ", protodomain=" + protodomain
 				+ ", domainDomain=" + domainDomain + "]";
 	}
-	
+
 }

@@ -15,12 +15,16 @@ import org.apache.velocity.app.VelocityEngine;
 import org.biojava3.structure.align.symm.census2.Alignment;
 
 /**
- * A class that makes pretty HTML pages from {@link SearchResults}.
- * 
+ * A class that makes pretty HTML pages from {@link SearchResults} XML files.
+ * Uses Apache Velocity templates in {@code src/main/resources/web}.
  * @author dmyerstu
  */
 public class HTMLWriter {
 
+	/**
+	 * Something that assigns filenames according to query protodomains.
+	 * @author dmyerstu
+	 */
 	public static interface QueryNamer {
 		String name(SearchResult result, int index);
 	}

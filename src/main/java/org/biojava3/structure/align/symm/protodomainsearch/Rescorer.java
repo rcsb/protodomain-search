@@ -10,23 +10,31 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/**
+ * A utility that reads in a search XML file (corresponding to {@link SearchResults}), and determines which
+ * {@link Discovery Discoveries} are significant, mostly for the purpose of filtering.
+ * 
+ * @author dmyersturnbull
+ * 
+ */
 public class Rescorer {
+
+	private DiscoveryScorer scorer;
 
 	public static void main(String[] args) throws IOException {
 		if (args.length != 2) {
-			System.err.println("Usage: " + Rescorer.class.getSimpleName() + " input-file output-file [scorer-factory-method]");
+			System.err.println("Usage: " + Rescorer.class.getSimpleName()
+					+ " input-file output-file [scorer-factory-method]");
 			return;
 		}
 		Rescorer rescorer = new Rescorer(DiscoveryScorerFactory.sensible());
 		rescorer.rescore(new File(args[0]), new File(args[1]));
 	}
 
-	private DiscoveryScorer scorer;
-	
 	public Rescorer(DiscoveryScorer scorer) {
 		this.scorer = scorer;
 	}
-	
+
 	public void rescore(File input, File output) throws IOException {
 		SearchResults results = SearchResults.fromXML(input);
 		SearchResults rescored = rescore(results);
@@ -34,14 +42,14 @@ public class Rescorer {
 			bw.write(rescored.toXML());
 		}
 	}
-	
+
 	public SearchResults rescore(SearchResults results) {
-		
+
 		SearchResults newResults = new SearchResults();
 		newResults.setTimestamp(results.getTimestamp());
-		
-		final HashMap<String,Double> scores = new HashMap<String,Double>();
-		
+
+		final HashMap<String, Double> scores = new HashMap<String, Double>();
+
 		for (SearchResult result : results.getData()) {
 			if (!scorer.isSignificant(result.getQuery())) {
 				List<Discovery> discoveries = scorer.getSignificant(result);
@@ -53,7 +61,7 @@ public class Rescorer {
 				scores.put(result.getQuery().getProtodomain(), score);
 			}
 		}
-		
+
 		// now sort
 		Comparator<SearchResult> comp = new Comparator<SearchResult>() {
 			@Override
@@ -65,8 +73,8 @@ public class Rescorer {
 		sorted.addAll(newResults.getData());
 		newResults.getData().clear();
 		newResults.addAll(sorted);
-		
+
 		return newResults;
 	}
-	
+
 }

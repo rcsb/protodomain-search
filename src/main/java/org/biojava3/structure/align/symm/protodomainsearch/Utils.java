@@ -14,50 +14,26 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.StructureException;
-import org.biojava.bio.structure.align.ce.AbstractUserArgumentProcessor;
 import org.biojava.bio.structure.align.util.AtomCache;
-import org.biojava.bio.structure.scop.BerkeleyScopInstallation;
 import org.biojava.bio.structure.scop.ScopDatabase;
 import org.biojava.bio.structure.scop.ScopDomain;
 import org.biojava.bio.structure.scop.ScopFactory;
 
+/**
+ * Static utilites related to the protodomain search.
+ * @author dmyerstu
+ */
 public class Utils {
 
-	private AtomCache cache;
-	public AtomCache getCache() {
-		return cache;
-	}
-
-	public static boolean isSet() {
-		return me != null;
-	}
 	public static final String NEWLINE;
-	static {
-		NEWLINE = System.getProperty("line.separator");
-	}
-	public Utils() {
-		this(new AtomCache());
-	}
-	public Utils(String pdbDir) {
-		this(new AtomCache(pdbDir, false));
-	}
-	public Utils(AtomCache cache) {
-		this.cache = cache;
-	}
 
-	public void setCache(AtomCache cache) {
-		this.cache = cache;
-	}
+	private static final Logger logger = LogManager.getLogger(Utils.class.getName());
 
 	private static Utils me;
 
-	public static Utils getInstance() {
-		if (Utils.me == null) throw new IllegalStateException("Must set instance first");
-		return me;
-	}
-
-	public static void setInstance(Utils instance) {
-		Utils.me = instance;
+	private AtomCache cache;
+	static {
+		NEWLINE = System.getProperty("line.separator");
 	}
 
 	public static Class<?>[] classes(Object[] args) {
@@ -80,35 +56,33 @@ public class Utils {
 		return r;
 	}
 
-	public static String linkifyScopClassification(String scopId, String scopClassification) {
-		return "<a href=\"http://scop.berkeley.edu/search/?key=" + scopId + "\">" + scopClassification + "</a>";
+	public static String formatDecimal(double number) {
+		return formatDecimal(number, 2);
 	}
 
-	public static String linkifyAlignment(String referringProtodomain, String resultDomain, String resultProtodomain) {
-		return "<a href=\"http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1=" + referringProtodomain + "&amp;name2=" + resultDomain + "\">" + resultProtodomain + "</a>";
+	public static String formatDecimal(double number, int nDigits) {
+		NumberFormat nf = new DecimalFormat();
+		nf.setMaximumFractionDigits(nDigits);
+		String complete = nf.format(number);
+		return complete.replace('-', '−'); // extreme OCD
 	}
 
-	public static String linkifyPdbStructure(String pdbId, String scopId) {
-		return "<a href=\"http://www.pdb.org/pdb/explore/explore.do?structureId=" + pdbId + "\">" + scopId + "</a>";
+	public static String formatDuration(long millis) {
+		String hrs = millis / (60 * 60 * 1000) + " hours, ";
+		String mins = millis / (60 * 1000) % 60 + " minutes, ";
+		String secs = "and " + millis / 1000 % 60 + " seconds.";
+		return hrs + mins + secs;
 	}
 
-	public static String linkifySymmetry(String protodomainString, String scopId) {
-		return "<a href=\"http://source.rcsb.org/jfatcatserver/showSymmetry.jsp?name1=" + scopId + "\">" + protodomainString + "</a>";
+	public static String formatPercentage(double number) {
+		return formatPercentage(number, 2);
 	}
 
-	public static String removeChain(String pdbId) {
-		if (pdbId.contains(".")) {
-			return pdbId.substring(0, pdbId.indexOf("."));
-		}
-		return pdbId;
-	}
-
-	public static String repeat(String s, int n) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < n; i++) {
-			sb.append(s);
-		}
-		return sb.toString();
+	public static String formatPercentage(double number, int nDigits) {
+		NumberFormat nf = new DecimalFormat();
+		nf.setMaximumFractionDigits(nDigits);
+		String complete = nf.format(number * 100.0) + "%";
+		return complete.replace('-', '−'); // extreme OCD
 	}
 
 	public static Atom[] getAllAtoms(String name, AtomCache cache) {
@@ -129,8 +103,6 @@ public class Utils {
 		}
 	}
 
-	private static final Logger logger = LogManager.getLogger(Utils.class.getName());
-
 	/**
 	 * Tries to return the PDB description. Just logs and returns the string "unknown" on error.
 	 */
@@ -145,6 +117,11 @@ public class Utils {
 		return "unknown";
 	}
 
+	public static Utils getInstance() {
+		if (Utils.me == null) throw new IllegalStateException("Must set instance first");
+		return me;
+	}
+
 	/**
 	 * Tries to return the PDB Id. Just logs and returns the string "unknown" on error.
 	 */
@@ -154,31 +131,30 @@ public class Utils {
 		if (domain == null) return "unknown";
 		return domain.getPdbId();
 	}
-	
-	public static String formatDecimal(double number) {
-		return formatDecimal(number, 2);
-	}
-	public static String formatDecimal(double number, int nDigits) {
-		NumberFormat nf = new DecimalFormat();
-		nf.setMaximumFractionDigits(nDigits);
-		String complete = nf.format(number);
-		return complete.replace('-', '−'); // extreme OCD
+
+	/**
+	 * Returns whether this Utils singleton is set.
+	 */
+	public static boolean isSet() {
+		return me != null;
 	}
 
-	public static String formatPercentage(double number) {
-		return formatPercentage(number, 2);
-	}
-	public static String formatPercentage(double number, int nDigits) {
-		NumberFormat nf = new DecimalFormat();
-		nf.setMaximumFractionDigits(nDigits);
-		String complete = nf.format(number*100.0) + "%";
-		return complete.replace('-', '−'); // extreme OCD
+	public static String linkifyAlignment(String referringProtodomain, String resultDomain, String resultProtodomain) {
+		return "<a href=\"http://www.pdb.org/pdb/workbench/showPrecalcAlignment.do?action=pw_ce&amp;name1="
+				+ referringProtodomain + "&amp;name2=" + resultDomain + "\">" + resultProtodomain + "</a>";
 	}
 
-	public static boolean sanityCheckPreAlign(Atom[] ca1, Atom[] ca2) {
-		if (ca1 == ca2) return false;
-		if (ca1[0].getGroup().getChain().getParent() == ca2[0].getGroup().getChain().getParent()) return false;
-		return true;
+	public static String linkifyPdbStructure(String pdbId, String scopId) {
+		return "<a href=\"http://www.pdb.org/pdb/explore/explore.do?structureId=" + pdbId + "\">" + scopId + "</a>";
+	}
+
+	public static String linkifyScopClassification(String scopId, String scopClassification) {
+		return "<a href=\"http://scop.berkeley.edu/search/?key=" + scopId + "\">" + scopClassification + "</a>";
+	}
+
+	public static String linkifySymmetry(String protodomainString, String scopId) {
+		return "<a href=\"http://source.rcsb.org/jfatcatserver/showSymmetry.jsp?name1=" + scopId + "\">"
+				+ protodomainString + "</a>";
 	}
 
 	public static void printCmd(String cmd) {
@@ -197,15 +173,34 @@ public class Utils {
 		}
 	}
 
-	public static String formatDuration(long millis) {
-		String hrs = millis / (60 * 60 * 1000) + " hours, ";
-		String mins = millis / (60 * 1000) % 60 + " minutes, ";
-		String secs = "and " + millis / 1000 % 60 + " seconds.";
-		return hrs + mins + secs;
+	public static String removeChain(String pdbId) {
+		if (pdbId.contains(".")) {
+			return pdbId.substring(0, pdbId.indexOf("."));
+		}
+		return pdbId;
+	}
+
+	public static String repeat(String s, int n) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < n; i++) {
+			sb.append(s);
+		}
+		return sb.toString();
+	}
+
+	public static boolean sanityCheckPreAlign(Atom[] ca1, Atom[] ca2) {
+		if (ca1 == ca2) return false;
+		if (ca1[0].getGroup().getChain().getParent() == ca2[0].getGroup().getChain().getParent()) return false;
+		return true;
+	}
+
+	public static void setInstance(Utils instance) {
+		Utils.me = instance;
 	}
 
 	/**
 	 * Converts space indentation to tab indentation, assuming no lines have trailing whitespace.
+	 * 
 	 * @param input
 	 * @param output
 	 * @param nSpaces
@@ -217,7 +212,7 @@ public class Utils {
 		String line = "";
 		while ((line = br.readLine()) != null) {
 			String trimmed = line.trim();
-			int indent = (int) (((float) (line.length() - trimmed.length())) / (float) nSpaces);
+			int indent = (int) ((float) (line.length() - trimmed.length()) / (float) nSpaces);
 			pw.println(repeat("\t", indent) + trimmed);
 		}
 		br.close();
@@ -229,9 +224,29 @@ public class Utils {
 		String[] lines = input.split(NEWLINE);
 		for (String line : lines) {
 			String trimmed = line.trim();
-			int indent = (int) (((float) (line.length() - trimmed.length())) / (float) nSpaces);
+			int indent = (int) ((float) (line.length() - trimmed.length()) / (float) nSpaces);
 			sb.append(repeat("\t", indent) + trimmed + NEWLINE);
 		}
 		return sb.toString();
+	}
+
+	public Utils() {
+		this(new AtomCache());
+	}
+
+	public Utils(AtomCache cache) {
+		this.cache = cache;
+	}
+
+	public Utils(String pdbDir) {
+		this(new AtomCache(pdbDir, false));
+	}
+
+	public AtomCache getCache() {
+		return cache;
+	}
+
+	public void setCache(AtomCache cache) {
+		this.cache = cache;
 	}
 }

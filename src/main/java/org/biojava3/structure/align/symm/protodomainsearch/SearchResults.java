@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * A list of {@link SearchResult SearchResults}.
- * 
+ * This is a serialization of the wrapper XML element of {@link Search Searches}.
  * @author dmyerstu
  */
 @XmlRootElement(name = "SearchResults", namespace = "http://source.rcsb.org")

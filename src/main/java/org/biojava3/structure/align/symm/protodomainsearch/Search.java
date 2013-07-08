@@ -27,6 +27,12 @@ import org.biojava3.structure.align.symm.census2.Significance;
 import org.biojava3.structure.align.symm.census2.SignificanceFactory;
 import org.biojava3.structure.align.symm.census2.representatives.Representatives;
 
+/**
+ * Runs a search of a list of query protodomains against a list of representative domains.
+ * 
+ * @author dmyerstu
+ * 
+ */
 public class Search {
 
 	private static final Logger logger = LogManager.getLogger(Search.class.getPackage().getName());

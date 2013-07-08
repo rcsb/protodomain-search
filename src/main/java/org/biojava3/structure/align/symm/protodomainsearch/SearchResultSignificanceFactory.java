@@ -2,6 +2,10 @@ package org.biojava3.structure.align.symm.protodomainsearch;
 
 import org.biojava3.structure.align.symm.census2.Alignment;
 
+/**
+ * A factory for {@link SearchResultSignificance} objects.
+ * @author dmyerstu
+ */
 public class SearchResultSignificanceFactory {
 
 	public static SearchResultSignificance ultraLiberal() {

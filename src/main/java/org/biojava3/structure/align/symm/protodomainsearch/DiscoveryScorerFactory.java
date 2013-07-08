@@ -9,6 +9,10 @@ import java.util.TreeSet;
 
 import org.biojava3.structure.align.symm.census2.Result;
 
+/**
+ * A factory for {@link DiscoveryScorer} objects.
+ * @author dmyerstu
+ */
 public class DiscoveryScorerFactory {
 
 	public static DiscoveryScorer sensible() {

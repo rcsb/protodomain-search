@@ -27,6 +27,11 @@ import org.biojava3.structure.align.symm.protodomain.Protodomain;
 import org.rcsb.fatcat.server.dao.DBAlignment;
 import org.rcsb.fatcat.server.util.AlignmentCache;
 
+/**
+ * Runs alignments for a single query protodomain against a set of representative domains.
+ * 
+ * @author dmyerstu
+ */
 public class SearchJob implements Callable<SearchResult> {
 
 	private static final Logger logger = LogManager.getLogger(SearchJob.class.getPackage().getName());
@@ -234,12 +239,12 @@ public class SearchJob implements Callable<SearchResult> {
 	}
 
 	private AFPChain alignDomainDomain(ScopDomain queryDomain, ScopDomain domain) throws IOException,
-	StructureException {
+			StructureException {
 		return align(queryDomain.getScopId(), domain.getScopId(), algorithm);
 	}
 
 	private AFPChain alignProtodomainDomain(String protodomain, ScopDomain domain, Atom[] ca2) throws IOException,
-	StructureException {
+			StructureException {
 		Atom[] ca1 = cache.getAtoms(protodomain);
 		return align(protodomain, domain.getScopId(), ca1, ca2, algorithm.getAlgorithm());
 	}
