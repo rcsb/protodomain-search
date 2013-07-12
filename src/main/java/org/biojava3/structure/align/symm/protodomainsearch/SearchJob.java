@@ -77,7 +77,8 @@ public class SearchJob implements Callable<SearchResult> {
 					"Cache, domain, count, representatives, and superfamilies must be set first");
 		}
 		final String queryScopId = query.getScopId();
-		final String protodomain = query.getProtodomain();
+		final Protodomain fullProtodomain = Protodomain.fromString(query.getProtodomain(), queryDomain, cache);
+		final Protodomain protodomain = fullProtodomain.createSubstruct(query.getOrder());
 		List<Discovery> discoveries = new ArrayList<Discovery>();
 
 		for (ScopDomain domain : representatives) {
@@ -91,7 +92,7 @@ public class SearchJob implements Callable<SearchResult> {
 				logger.info("Working on " + domain.getScopId() + " against " + protodomain);
 
 				Atom[] ca2 = cache.getAtoms(domain.getScopId());
-				AFPChain afpChain = alignProtodomainDomain(protodomain, domain, ca2);
+				AFPChain afpChain = alignProtodomainDomain(protodomain.getString(), domain, ca2);
 				Result symmetryResult = null;
 				Alignment domainDomain = null;
 				Alignment alignment = new Alignment(afpChain);
@@ -99,7 +100,7 @@ public class SearchJob implements Callable<SearchResult> {
 
 				if (significance.isPossiblySignificant(alignment)) {
 					try {
-						resultProtodomain = Protodomain.fromReferral(afpChain, ca2, 1, cache).getString();
+						resultProtodomain = Protodomain.fromReferral(afpChain, ca2, cache).getString();
 					} catch (RuntimeException e) {
 						logger.error("Could not get protodomain for result " + domain.getScopId() + " from "
 								+ queryScopId, e);
