@@ -66,6 +66,7 @@ public class Search {
 			System.err.println("Usage: " + Search.class.getSimpleName() + " census-file output-file");
 			return;
 		}
+		ScopFactory.setScopDatabase(ScopFactory.VERSION_1_75A);
 		final File census = new File(args[1]);
 		final File output = new File(args[2]);
 		searchDefault(census, output);
@@ -75,7 +76,6 @@ public class Search {
 		try {
 			AtomCache cache = new AtomCache();
 			Utils.setInstance(new Utils(cache));
-			ScopFactory.setScopDatabase(ScopFactory.getSCOP(ScopFactory.VERSION_1_75A));
 			Search search = new Search(census);
 			search.setCache(cache);
 			search.setOutputFile(output);
