@@ -3,17 +3,17 @@
 	<data>
 		<discovery>
 			<alignment>
-				<alignLength>116</alignLength>
-				<alignScore>186.04823</alignScore>
+				<alignLength>46</alignLength>
+				<alignScore>65.201584</alignScore>
 				<block1Length>0</block1Length>
 				<block2Length>0</block2Length>
-				<coverage>47</coverage>
-				<gapLength>50</gapLength>
-				<identity>0.05172414</identity>
-				<rmsd>5.2198477</rmsd>
-				<similarity>0.12068965</similarity>
-				<tmScore>0.24536362</tmScore>
-				<zScore>1.99</zScore>
+				<coverage>55</coverage>
+				<gapLength>7</gapLength>
+				<identity>0.06521739</identity>
+				<rmsd>4.4147763</rmsd>
+				<similarity>0.2173913</similarity>
+				<tmScore>0.22859985</tmScore>
+				<zScore>2.58</zScore>
 			</alignment>
 			<domainDomain>
 				<alignLength>116</alignLength>
@@ -28,7 +28,7 @@
 				<tmScore>0.24433422</tmScore>
 				<zScore>1.99</zScore>
 			</domainDomain>
-			<protodomain>2jaj.A_27-72,A_96-117</protodomain>
+			<protodomain>2jaj.A_93-131</protodomain>
 			<result>
 				<alignment>
 					<alignLength>306</alignLength>
@@ -63,17 +63,17 @@
 		</discovery>
 		<discovery>
 			<alignment>
-				<alignLength>116</alignLength>
-				<alignScore>120.322754</alignScore>
+				<alignLength>70</alignLength>
+				<alignScore>58.732765</alignScore>
 				<block1Length>0</block1Length>
 				<block2Length>0</block2Length>
-				<coverage>28</coverage>
-				<gapLength>77</gapLength>
+				<coverage>48</coverage>
+				<gapLength>36</gapLength>
 				<identity>0.0</identity>
-				<rmsd>5.6931815</rmsd>
-				<similarity>0.060344826</similarity>
-				<tmScore>0.18176606</tmScore>
-				<zScore>0.0</zScore>
+				<rmsd>4.5923495</rmsd>
+				<similarity>0.028571429</similarity>
+				<tmScore>0.20546652</tmScore>
+				<zScore>0.73</zScore>
 			</alignment>
 			<domainDomain>
 				<alignLength>116</alignLength>
@@ -88,7 +88,7 @@
 				<tmScore>0.18176606</tmScore>
 				<zScore>0.0</zScore>
 			</domainDomain>
-			<protodomain>2dsm.B_24-62</protodomain>
+			<protodomain>2dsm.B_12-21,B_29-36,B_43-58</protodomain>
 			<result>
 				<alignment>
 					<alignLength>38</alignLength>
@@ -151,5 +151,5 @@
 			<sunId>15261</sunId>
 		</query>
 	</data>
-	<timestamp>2013-05-22 17:24:45</timestamp>
+	<timestamp>2013-07-11 21:23:43</timestamp>
 </ns2:SearchResults>
