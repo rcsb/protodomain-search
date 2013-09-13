@@ -167,7 +167,6 @@ public class Search {
 					SearchJob job = new SearchJob(query, representatives);
 					job.setAlgorithm(algorithm);
 					job.setCount(count);
-					job.setSuperfamilies(Representatives.get().getSuperfamilies());
 					job.setSymmetryAlgorithm(symmetryAlgorithm);
 					job.setCache(cache);
 					job.setCheckDiscoveryDomain(checkDiscoveryDomain);

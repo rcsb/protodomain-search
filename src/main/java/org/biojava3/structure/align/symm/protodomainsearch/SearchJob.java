@@ -17,6 +17,7 @@ import org.biojava.bio.structure.align.util.AFPChainScorer;
 import org.biojava.bio.structure.align.util.AtomCache;
 import org.biojava.bio.structure.scop.ScopDescription;
 import org.biojava.bio.structure.scop.ScopDomain;
+import org.biojava.bio.structure.scop.ScopFactory;
 import org.biojava3.structure.align.symm.census2.Alignment;
 import org.biojava3.structure.align.symm.census2.Census.AlgorithmGiver;
 import org.biojava3.structure.align.symm.census2.CensusJob;
@@ -54,8 +55,6 @@ public class SearchJob implements Callable<SearchResult> {
 
 	private SearchResultSignificance significance;
 
-	private HashMap<String, ScopDescription> superfamilies;
-
 	private AlgorithmGiver symmetryAlgorithm;
 
 	private Significance symmetrySignificance;
@@ -72,7 +71,7 @@ public class SearchJob implements Callable<SearchResult> {
 	@Override
 	public SearchResult call() throws Exception {
 
-		if (cache == null || count == null || queryDomain == null || representatives == null || superfamilies == null) {
+		if (cache == null || count == null || queryDomain == null || representatives == null) {
 			throw new IllegalStateException(
 					"Cache, domain, count, representatives, and superfamilies must be set first");
 		}
@@ -208,10 +207,6 @@ public class SearchJob implements Callable<SearchResult> {
 		this.significance = significance;
 	}
 
-	public void setSuperfamilies(HashMap<String, ScopDescription> superfamilies) {
-		this.superfamilies = superfamilies;
-	}
-
 	public void setSymmetryAlgorithm(AlgorithmGiver symmetryAlgorithm) {
 		this.symmetryAlgorithm = symmetryAlgorithm;
 	}
@@ -251,11 +246,7 @@ public class SearchJob implements Callable<SearchResult> {
 	}
 
 	private Result getSymmetry(ScopDomain domain) {
-		ScopDescription superfamily = superfamilies.get(domain.getScopId());
-		CensusJob job = new CensusJob(cache, symmetryAlgorithm, symmetrySignificance);
-		job.setCount(0);
-		job.setDomain(domain);
-		job.setSuperfamily(superfamily);
+		CensusJob job = CensusJob.forScopId(algorithm, symmetrySignificance, domain.getScopId(), count, cache, ScopFactory.getSCOP());
 		return job.call();
 	}
 
