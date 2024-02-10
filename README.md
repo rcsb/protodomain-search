@@ -3,6 +3,9 @@ protodomain-search
 
 Search for subunits of tertiary psuedosymmetry that occur throughout protein fold space.
 
+> [!NOTE]
+> Note that this repository has been archived because it is not actively maintained anymore.
+
 ## Dependencies
 
 This library depends on 
